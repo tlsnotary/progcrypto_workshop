@@ -27,7 +27,8 @@ async fn main() {
     println!("Listening on: {}", addr);
 
     // Load the notary signing key
-    let signing_key_str = str::from_utf8(include_bytes!("./notary/notary.key")).unwrap();
+    let signing_key_str =
+        str::from_utf8(include_bytes!("../../../notary/fixture/notary/notary.key")).unwrap();
     let signing_key = p256::ecdsa::SigningKey::from_pkcs8_pem(signing_key_str).unwrap();
 
     loop {
