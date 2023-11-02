@@ -9,7 +9,7 @@ use tlsn_core::proof::TlsProof;
 use tokio::io::AsyncWriteExt as _;
 use tokio_util::compat::{FuturesAsyncReadCompatExt, TokioAsyncReadCompatExt};
 
-use tlsn_prover::tls::{Prover, ProverConfig};
+use tlsn_prover::tls::{state::Notarize, Prover, ProverConfig};
 
 // Setting of the application server
 const SERVER_DOMAIN: &str = "example.com";
@@ -96,47 +96,12 @@ async fn main() {
     let prover = prover_task.await.unwrap().unwrap();
 
     // Prepare for notarization.
-    let mut prover = prover.start_notarize();
-
-    // Identify the ranges in the outbound data which contain data which we want to disclose
-    let (public_ranges, _) = find_ranges(
-        prover.sent_transcript().data(),
-        &[
-            // Redact the value of the "User-Agent" header. It will NOT be disclosed.
-            USER_AGENT.as_bytes(),
-        ],
-    );
-
-    let recv_len = prover.recv_transcript().data().len();
-
-    let builder = prover.commitment_builder();
-
-    // Commit to each range of the public outbound data which we want to disclose
-    let sent_commitments: Vec<_> = public_ranges
-        .iter()
-        .map(|r| builder.commit_sent(r.clone()).unwrap())
-        .collect();
-
-    // Commit to all inbound data in one shot, as we don't need to redact anything in it
-    let recv_commitment = builder.commit_recv(0..recv_len).unwrap();
-
-    // Finalize, returning the notarized session
-    let notarized_session = prover.finalize().await.unwrap();
-
-    // Create a proof for all committed data in this session
-    let mut proof_builder = notarized_session.data().build_substrings_proof();
-
-    // Reveal all the public ranges
-    for commitment_id in sent_commitments {
-        proof_builder.reveal(commitment_id).unwrap();
-    }
-    proof_builder.reveal(recv_commitment).unwrap();
-
-    let substrings_proof = proof_builder.build().unwrap();
-
-    let proof = TlsProof {
-        session: notarized_session.session_proof(),
-        substrings: substrings_proof,
+    let prover = prover.start_notarize();
+    let redact = true;
+    let proof = if !redact {
+        build_proof_without_redactions(prover).await
+    } else {
+        build_proof_with_redactions(prover).await
     };
 
     // Write the proof to a file
@@ -179,4 +144,84 @@ fn find_ranges(seq: &[u8], private_seq: &[&[u8]]) -> (Vec<Range<usize>>, Vec<Ran
     }
 
     (public_ranges, private_ranges)
+}
+
+async fn build_proof_without_redactions(mut prover: Prover<Notarize>) -> TlsProof {
+    let sent_len = prover.sent_transcript().data().len();
+    let recv_len = prover.recv_transcript().data().len();
+
+    let builder = prover.commitment_builder();
+    let sent_commitment = builder.commit_sent(0..sent_len).unwrap();
+    let recv_commitment = builder.commit_recv(0..recv_len).unwrap();
+
+    // Finalize, returning the notarized session
+    let notarized_session = prover.finalize().await.unwrap();
+
+    // Create a proof for all committed data in this session
+    let mut proof_builder = notarized_session.data().build_substrings_proof();
+
+    // Reveal all the public ranges
+    proof_builder.reveal(sent_commitment).unwrap();
+    proof_builder.reveal(recv_commitment).unwrap();
+
+    let substrings_proof = proof_builder.build().unwrap();
+
+    TlsProof {
+        session: notarized_session.session_proof(),
+        substrings: substrings_proof,
+    }
+}
+
+async fn build_proof_with_redactions(mut prover: Prover<Notarize>) -> TlsProof {
+    // Identify the ranges in the outbound data which contain data which we want to disclose
+    let (sent_public_ranges, _) = find_ranges(
+        prover.sent_transcript().data(),
+        &[
+            // Redact the value of the "User-Agent" header. It will NOT be disclosed.
+            USER_AGENT.as_bytes(),
+        ],
+    );
+
+    // Identify the ranges in the inbound data which contain data which we want to disclose
+    let (recv_public_ranges, _) = find_ranges(
+        prover.recv_transcript().data(),
+        &[
+            // Redact the value of the title. It will NOT be disclosed.
+            "Example Domain".as_bytes(),
+        ],
+    );
+
+    let builder = prover.commitment_builder();
+
+    // Commit to each range of the public outbound data which we want to disclose
+    let sent_commitments: Vec<_> = sent_public_ranges
+        .iter()
+        .map(|r| builder.commit_sent(r.clone()).unwrap())
+        .collect();
+    // Commit to each range of the public inbound data which we want to disclose
+    let recv_commitments: Vec<_> = recv_public_ranges
+        .iter()
+        .map(|r| builder.commit_recv(r.clone()).unwrap())
+        .collect();
+
+    // Finalize, returning the notarized session
+    let notarized_session = prover.finalize().await.unwrap();
+
+    // Create a proof for all committed data in this session
+    let mut proof_builder = notarized_session.data().build_substrings_proof();
+
+    // Reveal all the public ranges
+    for commitment_id in sent_commitments {
+        proof_builder.reveal(commitment_id).unwrap();
+    }
+    for commitment_id in recv_commitments {
+        proof_builder.reveal(commitment_id).unwrap();
+    }
+
+    let substrings_proof = proof_builder.build().unwrap();
+
+    TlsProof {
+        session: notarized_session.session_proof(),
+        substrings: substrings_proof,
+    }
 }
