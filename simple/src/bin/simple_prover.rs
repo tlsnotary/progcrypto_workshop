@@ -122,7 +122,7 @@ async fn main() {
         .unwrap();
 
     println!("Notarization completed successfully!");
-    println!("The proof has been written to proof.json");
+    println!("The proof has been written to `simple_proof.json`");
 }
 
 /// Find the ranges of the public and private parts of a sequence.
