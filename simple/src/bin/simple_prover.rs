@@ -106,7 +106,9 @@ async fn main() {
 
     // Prepare for notarization.
     let prover = prover.start_notarize();
-    let redact = true;
+
+    //Build proof (with our without redactions)
+    let redact = false;
     let proof = if !redact {
         build_proof_without_redactions(prover).await
     } else {
@@ -114,7 +116,7 @@ async fn main() {
     };
 
     // Write the proof to a file
-    let mut file = tokio::fs::File::create("proof.json").await.unwrap();
+    let mut file = tokio::fs::File::create("simple_proof.json").await.unwrap();
     file.write_all(serde_json::to_string_pretty(&proof).unwrap().as_bytes())
         .await
         .unwrap();
@@ -256,27 +258,27 @@ async fn start_notary_thread() {
             str::from_utf8(include_bytes!("../../../notary/fixture/notary/notary.key")).unwrap();
         let signing_key = p256::ecdsa::SigningKey::from_pkcs8_pem(signing_key_str).unwrap();
 
-        // loop {
-        // Asynchronously wait for an inbound socket.
-        let (socket, socket_addr) = listener.accept().await.unwrap();
+        loop {
+            // Asynchronously wait for an inbound socket.
+            let (socket, socket_addr) = listener.accept().await.unwrap();
 
-        println!("Accepted connection from: {}", socket_addr);
+            println!("Accepted connection from: {}", socket_addr);
 
-        {
-            let signing_key = signing_key.clone();
+            {
+                let signing_key = signing_key.clone();
 
-            // Spawn notarization task to be run concurrently
-            tokio::spawn(async move {
-                // Setup default config. Normally a different ID would be generated
-                // for each notarization.
-                let config = VerifierConfig::builder().id("example").build().unwrap();
+                // Spawn notarization task to be run concurrently
+                tokio::spawn(async move {
+                    // Setup default config. Normally a different ID would be generated
+                    // for each notarization.
+                    let config = VerifierConfig::builder().id("example").build().unwrap();
 
-                Verifier::new(config)
-                    .notarize::<_, p256::ecdsa::Signature>(socket.compat(), &signing_key)
-                    .await
-                    .unwrap();
-            });
+                    Verifier::new(config)
+                        .notarize::<_, p256::ecdsa::Signature>(socket.compat(), &signing_key)
+                        .await
+                        .unwrap();
+                });
+            }
         }
-        // }
     });
 }

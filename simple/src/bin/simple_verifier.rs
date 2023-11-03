@@ -10,7 +10,7 @@ use std::str;
 /// it and prints the verified data to the console.
 fn main() {
     // Deserialize the proof
-    let proof = std::fs::read_to_string("proof.json").unwrap();
+    let proof = std::fs::read_to_string("simple_proof.json").unwrap();
     let proof: TlsProof = serde_json::from_str(proof.as_str()).unwrap();
 
     let TlsProof {
