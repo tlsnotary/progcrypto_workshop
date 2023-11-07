@@ -1,5 +1,14 @@
-cargo run --release --example simple_notary
-cargo run --release --example simple_prover
-cargo run --release --example simple_verifier
+<figure>
+  <img src="tlsn-banner.png" alt="tlsn-banner">
+</figure>
 
-https://tlsnotary.github.io/proof_viz/
+# Progcrypto 2023: TLSNotary workshop
+
+Open the [workshop instructions](./workshop.md) to follow along.
+
+Links:
+* https://tlsnotary.org
+* https://docs.tlsnotary.org/
+* https://discord.gg/9XwESXtcN7
+* https://tlsnotary.github.io/tlsn/tlsn_prover/
+* https://tlsnotary.github.io/proof_viz/

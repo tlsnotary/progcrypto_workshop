@@ -176,9 +176,18 @@ The Notary server should log:
 2023-11-03T15:53:51.147074Z  INFO tokio-runtime-worker ThreadId(10) notary_server::service::tcp: Successful notarization using tcp! session_id="006b3293-8fba-44ac-8692-41daa47e4a9a"
 ```
 
+If the transcript was too long, you may encounter the following error. This occurs because there is a default limit of notarization size to 16kB:
+
+```log
+thread 'tokio-runtime-worker' panicked at 'called `Result::unwrap()` on an `Err` value: IOError(Custom { kind: InvalidData, error: BackendError(DecryptionError("Other: KOSReceiverActor is not setup")) })', /Users/heeckhau/tlsnotary/tlsn/tlsn/tlsn-prover/src/lib.rs:173:50
+```
+
+
 The Discord example code redacts the `auth_token`, but feel free to change the redacted regions.
 
 The proof is written to `discord_dm_proof.json` 
+
+
 
 #### Verify
 
