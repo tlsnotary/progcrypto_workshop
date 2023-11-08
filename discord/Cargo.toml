@@ -32,3 +32,11 @@ rustls = { version = "0.21" }
 tokio-rustls = { version = "0.24.1" }
 tracing = "0.1.40"
 rustls-pemfile = { version = "1.0.2" }
+
+[[example]]
+name = "discord_dm"
+path = "src/examples/discord_dm.rs"
+
+[[example]]
+name = "discord_dm_verifier"
+path = "src/examples/discord_dm_verifier.rs"

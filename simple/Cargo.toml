@@ -31,3 +31,11 @@ futures = "0.3.28"
 # Verifier
 elliptic-curve = { version = "0.13.5", features = ["pkcs8"] }
 chrono = "0.4.31"
+
+[[example]]
+name = "simple_prover"
+path = "src/examples/simple_prover.rs"
+
+[[example]]
+name = "simple_verifier"
+path = "src/examples/simple_verifier.rs"
