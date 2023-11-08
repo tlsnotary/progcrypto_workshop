@@ -2,23 +2,23 @@
   <img src="tlsn-banner.png" alt="tlsn-banner">
 </figure>
 
-# Progcrypto 2023: TLSNotary workshop
+# Progcrypto 2023: TLSNotary Workshop
 
-This workshop helps you getting started with TLSNotary, in native Rust and in the Browser.
+This workshop will help you get started with TLSNotary, both in native Rust and in the browser.
 
-1. [Most basic example: Proof and Verify public data (Rust)](#rust-simple)
-2. [Proof and Verify a private Discord DM (Rust)](#rust-discord)
-3. [Proof and Verify a private Twitter DM (Browser)](#browser)
+1. [Most Basic Example: Proving and Verifying Public Data (Rust)](#rust-simple)
+2. [Proving and Verifying a Private Discord DM (Rust)](#rust-discord)
+3. [Proving and Verifying a Private Twitter DM (Browser)](#browser)
 
 Objectives of this workshop:
-* Have a better feeling about what you can do with TLSNotary
-* Learn the basics on how to proof and verify data with TLSNotary
+* Gain a better understanding of what you can do with TLSNotary
+* Learn the basics of how to prove and verify data using TLSNotary
 
-## Setup 
+## Setup
 
-### Clone workshop repository
+### Clone Workshop Repository
 
-Clone this repository first
+Clone this repository:
 
 ```shell
 git clone git@github.com:heeckhau/progcrypto_workshop.git
@@ -26,35 +26,36 @@ git clone git@github.com:heeckhau/progcrypto_workshop.git
 
 ### Install Rust
 
-If you don't have `rust` installed yet, install it with [rustup](https://rustup.rs/):
+If you don't have Rust installed yet, you can install it using [rustup](https://rustup.rs/):
+
 ```shell
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 ```
 
-## Simple example: Notarize public data from example.com (Rust) <a name="rust-simple"></a>
+## Simple Example: Notarizing Public Data from example.com (Rust) <a name="rust-simple"></a>
 
-We start with the simplest possible use case for TLSNotary: 
-1. Fetch <https://example.com/> and create a proof of its content
-2. Verify the proof
+We will start with the simplest possible use case for TLSNotary:
+1. Fetch <https://example.com/> and create a proof of its content.
+2. Verify the proof.
 
-Next we will redact the content and verify again:
-1. Redact the `USER_AGENT` and titles
-2. Verify the redacted proof
+Next, we will redact the content and verify it again:
+1. Redact the `USER_AGENT` and titles.
+2. Verify the redacted proof.
 
 ### 1. Notarize <https://example.com/>
 
-Run a simple prover
+Run a simple prover:
 
 ```shell
 cargo run --release --example simple_prover
 ```
 
-Note: you can also run the `simple_prover` by clicking the **▶️ Run** button in VS Code. However, this will run without the `--release` by default and the execution will be a lot slower.
+Note: You can also run the `simple_prover` by clicking the **▶️ Run** button in VS Code. However, this will run without the `--release` flag by default, and the execution will be significantly slower.
 
-![](images/run_vs_code.png)
+![Run in VS Code](images/run_vs_code.png)
 
+If the notarization was successful, you should see this output in the console:
 
-If the notarization went fine, you should see this output in the console:
 ```log
 Listening on: 127.0.0.1:8080
 Connected to the Notary
@@ -65,15 +66,16 @@ Notarization completed successfully!
 The proof has been written to `simple_proof.json`
 ```
 
-### 2. Verify the proof
+### 2. Verify the Proof
 
-When you open `simple_proof.json` in an editor, you will see a json file with lots of non-human readable byte arrays. You can decode this file by running:
+When you open `simple_proof.json` in an editor, you will see a JSON file with lots of non-human-readable byte arrays. You can decode this file by running:
 
 ```shell
 cargo run --release --example simple_verifier
 ```
 
-This will output the TLS=transaction in clear text:
+This will output the TLS-transaction in clear text:
+
 ```log
 Successfully verified that the bytes below came from a session with Dns("example.com") at 2023-11-03 08:48:20 UTC.
 Note that the bytes which the Prover chose not to disclose are shown as X.
@@ -82,18 +84,22 @@ Bytes sent:
 ...
 ```
 
-### 3. Redact information
+### 3. Redact Information
 
 Open `simple_prover.rs` and locate the line with:
+
 ```rust
-    let redact = false;
+let redact = false;
 ```
-and change it to
+
+and change it to:
+
 ```rust
-    let redact = true;
+let redact = true;
 ```
 
 Next, if you run the `simple_prover` and `simple_verifier` again, you'll notice redacted `X`'s in the output:
+
 ```shell
 cargo run --release --example simple_prover
 cargo run --release --example simple_verifier
@@ -107,31 +113,28 @@ cargo run --release --example simple_verifier
 ...
 ```
 
-You can also use <https://tlsnotary.github.io/proof_viz/> to inspect your proofs.
-Open <https://tlsnotary.github.io/proof_viz/> and drag and drop `simple_proof.json` from your file explorer into the drop zone.
-![](images/proof_viz.png)
+You can also use <https://tlsnotary.github.io/proof_viz/> to inspect your proofs. Open <https://tlsnotary.github.io/proof_viz/> and drag and drop `simple_proof.json` from your file explorer into the drop zone.
+
+![Proof Visualization](images/proof_viz.png)
 
 Redacted bytes are marked with <span style="color:red">red █ characters</span>.
 
-### (Optional) Extra experiments
+### (Optional) Extra Experiments
 
-If the above steps were easy for you and you are waiting for the others: feel free to try these extra challenges:
+If the above steps were easy for you and you are waiting for others, feel free to try these extra challenges:
 
-- [ ] Modify the `server_name` (or any other data) in `simple_proof.json` and verify the proof is no longer valid
-- [ ] Modify `build_proof_with_redactions` function in `simple_prover.rs` to redact more or different data
+- [ ] Modify the `server_name` (or any other data) in `simple_proof.json` and verify that the proof is no longer valid.
+- [ ] Modify the `build_proof_with_redactions` function in `simple_prover.rs` to redact more or different data.
 
+## Notarizing Private Information: Discord Message (Rust)<a name="rust-discord"></a>
 
-
-## Notarize private information: Discord message (Rust)<a name="rust-discord"></a>
-
-Next we will use TLSNotary to generate a proof of private information: a private Discord DM.
+Next, we will use TLSNotary to generate a proof of private information: a private Discord DM.
 
 We will also use an explicit (locally hosted) notary server this time.
 
+### 1. Start a Local Notary Server
 
-### 1. Start a local notary server
-
-The notary server used in this example is more functional compared to the (implicit) simple notary service, used in the example above. The simple notary version is easier to integrate from a prover's perspective, whereas this notary server provides additional features like TLS connection with prover, WebSocket endpoint, API endpoints for further customisation etc.
+The notary server used in this example is more functional compared to the (implicit) simple notary service used in the example above. The simple notary version is easier to integrate from a prover's perspective, whereas this notary server provides additional features like TLS connection with the prover, WebSocket endpoint, API endpoints for further customization, etc.
 
 ```shell
 cd notary
@@ -142,44 +145,47 @@ The notary server will now be running in the background waiting for connections.
 
 Keep it running and open a new terminal.
 
-### 2. Get Authorization token and channel ID
+### 2. Get Authorization Token and Channel ID
 
 In the main folder, copy a `.env.example` file and name it `.env`.
 
-In this `.env` we will input the `USER_AGENT`, `AUTHORIZATION` token and `CHANNEL_ID`.
+In this `.env`, we will input the `USER_AGENT`, `AUTHORIZATION` token, and `CHANNEL_ID`.
 
-| Name          | Example                                                                          | Location                                      |
-| ------------- | -------------------------------------------------------------------------------- | --------------------------------------------- |
-| USER_AGENT    | `Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/116.0` | Look for `User-Agent` in a request headers    |
-| AUTHORIZATION | `MTE1NDe1Otg4N6NxNjczOTM2OA.GYbUBf.aDtcMUKDOmg6C2kxxFtlFSN1pgdMMBtpHgBBEs`       | Look for `Authorization` in a request headers |
-| CHANNEL_ID    | `1154750485639745567`                                                            | URL                                           |
+| Name          | Example                                                                          | Location                                    |
+| ------------- | -------------------------------------------------------------------------------- | ------------------------------------------- |
+| USER_AGENT    | `Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/116.0` | Look for `User-Agent` in request headers    |
+| AUTHORIZATION | `MTE1NDe1Otg4N6NxNjczOTM2OA.GYbUBf.aDtcMUKDOmg6C2kxxFtlFSN1pgdMMBtpHgBBEs`       | Look for `Authorization` in request headers |
+| CHANNEL_ID    | `1154750485639745567`                                                            | URL                                         |
 
-You can obtain these parameters by opening [Discord](https://discord.com/channels/@me) in your browser and accessing the message history you want to notarize. 
+You can obtain these parameters by opening [Discord](https://discord.com/channels/@me) in your browser and accessing the message history you want to notarize.
 
 > **_NOTE:_** ⚠️ Please note that notarizing only works for short transcripts at the moment, so choose a contact with a short history.
 
-Next, open the **Developer Tools**, go to the **Network** tab, and refresh the page. Then, click on **Search** and type `/api` to filter results to Discord API requests. From there you can copy the needed information into your `.env` as indicated above.
+Next, open the **Developer Tools**, go to the **Network** tab, and refresh the page. Then, click on **Search** and type `/api` to filter results to Discord API requests. From there, you can copy the needed information into your `.env` as indicated above.
 
-You can find the `CHANNEL_ID` directly in the url:
+You can find the `CHANNEL_ID` directly in the URL:
 
 `https://discord.com/channels/@me/{CHANNEL_ID)`
 
-![](./images/discord_authentication_token.png)
+![Discord Authentication Token](./images/discord_authentication_token.png)
 
-### 3. Create proof
+### 3. Create Proof
 
-Next run the `discord_dm` example to generate a proof:
+Next, run the `discord_dm` example to generate a proof:
+
 ```shell
 RUST_LOG=debug,yamux=info cargo run --release --example discord_dm
 ```
 
-If all goes well, you get this output:
+If everything goes well, you should see this output:
+
 ```log
 ...
 2023-11-03T15:53:51.147732Z DEBUG discord_dm: Notarization complete!
 ```
 
 The Notary server should log:
+
 ```log
 2023-11-03T15:53:46.540247Z DEBUG                 main ThreadId(01) run_server: notary_server::server: Received a prover's TCP connection prover_address=127.0.0.1:56631
 ...
@@ -196,47 +202,44 @@ thread 'tokio-runtime-worker' panicked at 'called `Result::unwrap()` on an `Err`
 
 The Discord example code redacts the `auth_token`, but feel free to change the redacted regions.
 
-The proof is written to `discord_dm_proof.json` 
+The proof is written to `discord_dm_proof.json`.
 
 ### Verify
 
-Verify the proof by dropping the json file into <https://tlsnotary.github.io/proof_viz/> or by running:
+Verify the proof by dropping the JSON file into <https://tlsnotary.github.io/proof_viz/> or by running:
+
 ```shell
 cargo run --release --example discord_dm_verifier
 ```
 
-Good job! You have successfully used TLSNotary in Rust.
+Great job! You have successfully used TLSNotary in Rust.
 
-> **_NOTE:_** ℹ️ Leave the local notary server running for the next part of this workshop: testing the Browser extension.
-The MPC between the prover and the notary requires a lot of bandwidth, certainly too much for all of us to use a publicly hosted notary server at the same time.
+> **_NOTE:_** ℹ️ Leave the local notary server running for the next part of this workshop: testing the Browser extension. The MPC between the prover and the notary requires a lot of bandwidth, certainly too much for all of us to use a publicly hosted notary server at the same time.
 
-
-### (Optional) Notarize more private data
+### (Optional) Notarize More Private Data
 
 If the examples above were too easy for you, try to notarize data from other websites such as:
 
 - [ ] Amazon purchase
-- [ ] Twitter dm
+- [ ] Twitter DM
 - [ ] LinkedIn skill
 - [ ] Steam accomplishment
-- [ ] Garmin.connect achievement
+- [ ] Garmin Connect achievement
 - [ ] AirBnB score
 - [ ] Tesla ownership
 
-## TLSNotary browser extension <a name="browser"></a>
+## TLSNotary Browser Extension <a name="browser"></a>
 
 TODO
 
-### Install browser extension
+### Install Browser Extension
 
 TODO
 
-### Run a local proxy
+### Run a Local Proxy
 
 TODO
 
-### Notarize twitter account access
+### Notarize Twitter Account Access
 
 TODO
-
-
