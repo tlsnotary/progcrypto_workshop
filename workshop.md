@@ -8,7 +8,7 @@ This workshop will help you get started with TLSNotary, both in native Rust and 
 
 1. [Most Basic Example: Proving and Verifying Public Data (Rust)](#rust-simple)
 2. [Proving and Verifying a Private Discord DM (Rust)](#rust-discord)
-3. [Proving and Verifying a Private Twitter DM (Browser)](#browser)
+3. [Proving and Verifying ownership of a Twitter account (Browser)](#browser)
 
 Objectives of this workshop:
 * Gain a better understanding of what you can do with TLSNotary
@@ -230,16 +230,37 @@ If the examples above were too easy for you, try to notarize data from other web
 
 ## TLSNotary Browser Extension <a name="browser"></a>
 
-TODO
+TODO: Proof ownership of a Twitter account with TLSNotary's browser extension
 
 ### Install Browser Extension
 
-TODO
+1. Download the browser extension from
+<https://github.com/tlsnotary/tlsn-extension/releases/download/0.0.1/tlsn-extension-0.0.1.zip>
+2. unzip
+3. Enable developer mode
+4. Click **Load unpacked**
+5. Select the unzipped folder
+
+![](images/extension_install.png)
+
+(Optional:) Pin the extension, so that it is easier to find in the next steps:
+
+![](images/extension_pin.png)
 
 ### Run a Local Proxy
 
-TODO
+TODO: why we need a local proxy
+
+```
+git clone https://github.com/novnc/websockify && cd websockify
+./docker/build.sh
+docker run -it --rm -p 55688:80 novnc/websockify 80 api.twitter.com:443
+```
 
 ### Notarize Twitter Account Access
 
-TODO
+Open Twitter and login if you haven't yet.
+
+![](images/extension_twitter_requests.png)
+![](images/extension_notarize.png)
+![](images/extesnion_notarize_pending.png)
