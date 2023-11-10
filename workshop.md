@@ -21,8 +21,10 @@ Objectives of this workshop:
 Clone this repository:
 
 ```shell
-git clone git@github.com:heeckhau/progcrypto_workshop.git
+git clone https://github.com/tlsnotary/progcrypto_workshop.git
 ```
+
+Next open the `progcrypto_workshop` folder in your favorite IDE.
 
 ### Install Rust
 
@@ -30,6 +32,11 @@ If you don't have Rust installed yet, you can install it using [rustup](https://
 
 ```shell
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+```
+
+To configure your current shell, run:
+```shell
+source "$HOME/.cargo/env"
 ```
 
 ## Simple Example: Notarizing Public Data from example.com (Rust) <a name="rust-simple"></a>
@@ -232,13 +239,15 @@ If the examples above were too easy for you, try to notarize data from other web
 
 TODO: Proof ownership of a Twitter account with TLSNotary's browser extension
 
-### Install Browser Extension
+### Install Browser Extension (Chrome/Brave)
 
 1. Download the browser extension from
 <https://github.com/tlsnotary/tlsn-extension/releases/download/0.0.1/tlsn-extension-0.0.1.zip>
-2. unzip
-3. Enable developer mode
-4. Click **Load unpacked**
+2. unzip  
+   ⚠️ This is a flat zip file, so be careful if you unzip from the command line, this zip file contains many file at the top level
+3. Open **Manage Extensions**: <chrome://extensions/>
+3. Enable `Developer mode`
+4. Click the **Load unpacked** button
 5. Select the unzipped folder
 
 ![](images/extension_install.png)
