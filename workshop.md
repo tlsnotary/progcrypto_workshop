@@ -257,10 +257,34 @@ git clone https://github.com/novnc/websockify && cd websockify
 docker run -it --rm -p 55688:80 novnc/websockify 80 api.twitter.com:443
 ```
 
+We have to jump through one more hoop: Because the local notary server is using a self-generated certificate, we have manually allow the certificate in our browser:<a name="certificate"></a>
+
+* Visit <https://127.0.0.1:7047> in a new browser tab
+* click **Advanced** and next **Proceed to 127.0.0.1 (unsafe)
+
+This will manually override the ssl check on the local notary server and allow the extension to interact with it.
+
+![](images/notary_certificate.png)
+![](images/notary_certificate_advanced.png)
+
+
+
 ### Notarize Twitter Account Access
 
-Open Twitter and login if you haven't yet.
+* Open Twitter <https://twitter.com> and login if you haven't yet.
 
+* open the extension, you should see a box titled "Twitter Profile"
 ![](images/extension_twitter_requests.png)
+* click **Notarize**
 ![](images/extension_notarize.png)
 ![](images/extesnion_notarize_pending.png)
+
+now you should see that the request is being made.
+
+You can open the offscreen console and observe the browser extension logs by going to <chrome://extensions> -> TLSN Extension -> Details -> offscreen.html
+
+### Troubleshooting
+
+* Did you allow the locally generated notary certificate? [link](#certificate)
+* Requests(0): no requests in the Browser extension => restart the TLSN browser extension in <chrome://extensions/> and reload the Twitter page.
+* Is the notary server still running? It should, check the console log.
