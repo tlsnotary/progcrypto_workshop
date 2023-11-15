@@ -239,6 +239,14 @@ If the examples above were too easy for you, try to notarize data from other web
 
 TODO: Proof ownership of a Twitter account with TLSNotary's browser extension
 
+### Run Notary Server
+If the notary server isn't running already, run the notary server:
+
+```shell
+cd notary
+cargo run --release
+```
+
 ### Install Browser Extension (Chrome/Brave)
 
 1. Download the browser extension from
