@@ -268,7 +268,7 @@ docker run -it --rm -p 55688:80 novnc/websockify 80 api.twitter.com:443
 
 We have to jump through one more hoop: Because the local notary server is using a self-generated certificate, we have manually allow the certificate in our browser:<a name="certificate"></a>
 
-* Visit <https://127.0.0.1:7047> in a new browser tab
+* Visit <https://127.0.0.1:7047> or <https://localhost:7047> in a new browser tab
 * click **Advanced** and next **Proceed to 127.0.0.1 (unsafe)
 
 This will manually override the ssl check on the local notary server and allow the extension to interact with it.
@@ -276,7 +276,7 @@ This will manually override the ssl check on the local notary server and allow t
 ![](images/notary_certificate.png)
 ![](images/notary_certificate_advanced.png)
 
-
+Note that the page will show "This site can’t be reached" or "127.0.0.1 refused to connect". This is OK, we only need your browser to accept the local certificate.
 
 ### Notarize Twitter Account Access
 
