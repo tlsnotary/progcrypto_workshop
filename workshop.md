@@ -158,11 +158,11 @@ In the main folder, copy a `.env.example` file and name it `.env`.
 
 In this `.env`, we will input the `USER_AGENT`, `AUTHORIZATION` token, and `CHANNEL_ID`.
 
-| Name          | Example                                                                          | Location                                    |
-| ------------- | -------------------------------------------------------------------------------- | ------------------------------------------- |
-| USER_AGENT    | `Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/116.0` | Look for `User-Agent` in request headers    |
-| AUTHORIZATION | `MTE1NDe1Otg4N6NxNjczOTM2OA.GYbUBf.aDtcMUKDOmg6C2kxxFtlFSN1pgdMMBtpHgBBEs`       | Look for `Authorization` in request headers |
-| CHANNEL_ID    | `1154750485639745567`                                                            | URL                                         |
+| Name          | Example                                                                            | Location                                    |
+| ------------- | ---------------------------------------------------------------------------------- | ------------------------------------------- |
+| USER_AGENT    | `"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/116.0"` | Look for `User-Agent` in request headers    |
+| AUTHORIZATION | `"MTE1NDe1Otg4N6NxNjczOTM2OA.GYbUBf.aDtcMUKDOmg6C2kxxFtlFSN1pgdMMBtpHgBBEs"`       | Look for `Authorization` in request headers |
+| CHANNEL_ID    | `"1154750485639745567"`                                                            | URL                                         |
 
 You can obtain these parameters by opening [Discord](https://discord.com/channels/@me) in your browser and accessing the message history you want to notarize.
 
