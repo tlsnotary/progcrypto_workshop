@@ -292,6 +292,16 @@ now you should see that the request is being made.
 
 You can open the offscreen console and observe the browser extension logs by going to <chrome://extensions> -> TLSN Extension -> Details -> offscreen.html
 
+### Verify
+
+When the notarization is ready, you can click **View Proof**.
+
+If you did close the UI, you can find the proof by clicking **History** and **View Proof**.
+
+![](images/extension_history.png)
+
+You also have the option to download the proof. You can view this proof later by using the **Verify** button or via <https://tlsnotary.github.io/proof_viz/>.
+
 ### Troubleshooting
 
 * Did you allow the locally generated notary certificate? [link](#certificate)
