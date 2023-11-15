@@ -93,7 +93,7 @@ Bytes sent:
 
 ### 3. Redact Information
 
-Open `simple_prover.rs` and locate the line with:
+Open `simple/src/examples/simple_prover.rs` and locate the line with:
 
 ```rust
 let redact = false;
