@@ -6,7 +6,7 @@ use futures::AsyncWriteExt;
 use hyper::{Body, Request, StatusCode};
 use std::ops::Range;
 use tlsn_core::proof::TlsProof;
-use tokio::io::AsyncWriteExt as _;
+use tokio::io::{AsyncWriteExt as _, DuplexStream};
 use tokio_util::compat::{FuturesAsyncReadCompatExt, TokioAsyncReadCompatExt};
 
 use tlsn_prover::tls::{state::Notarize, Prover, ProverConfig};
@@ -15,14 +15,8 @@ use tlsn_prover::tls::{state::Notarize, Prover, ProverConfig};
 const SERVER_DOMAIN: &str = "example.com";
 const USER_AGENT: &str = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36";
 
-// Setting of the notary server — make sure these are the same with those in ./simple_notary.rs
-const NOTARY_HOST: &str = "127.0.0.1";
-const NOTARY_PORT: u16 = 8080;
-
 use p256::pkcs8::DecodePrivateKey;
-use std::{env, str};
-
-use tokio::net::TcpListener;
+use std::str;
 
 use tlsn_verifier::tls::{Verifier, VerifierConfig};
 
@@ -30,8 +24,10 @@ use tlsn_verifier::tls::{Verifier, VerifierConfig};
 async fn main() {
     tracing_subscriber::fmt::init();
 
+    let (prover_socket, notary_socket) = tokio::io::duplex(1 << 16);
+
     // Start a local simple notary service
-    start_notary_thread().await;
+    start_notary_thread(prover_socket).await;
 
     // A Prover configuration
     let config = ProverConfig::builder()
@@ -39,12 +35,6 @@ async fn main() {
         .server_dns(SERVER_DOMAIN)
         .build()
         .unwrap();
-
-    // Connect to the Notary
-    let notary_socket = tokio::net::TcpStream::connect((NOTARY_HOST, NOTARY_PORT))
-        .await
-        .unwrap();
-    println!("Connected to the Notary");
 
     // Create a Prover and set it up with the Notary
     // This will set up the MPC backend prior to connecting to the server.
@@ -237,48 +227,23 @@ async fn build_proof_with_redactions(mut prover: Prover<Notarize>) -> TlsProof {
     }
 }
 
-async fn start_notary_thread() {
+async fn start_notary_thread(socket: DuplexStream) {
     tokio::spawn(async {
-        // Allow passing an address to listen on as the first argument of this
-        // program, but otherwise we'll just set up our TCP listener on
-        // 127.0.0.1:8080 for connections.
-        let addr = env::args()
-            .nth(1)
-            .unwrap_or_else(|| "127.0.0.1:8080".to_string());
-
-        // Next up we create a TCP listener which will listen for incoming
-        // connections. This TCP listener is bound to the address we determined
-        // above and must be associated with an event loop.
-        let listener = TcpListener::bind(&addr).await.unwrap();
-
-        println!("Listening on: {}", addr);
-
         // Load the notary signing key
         let signing_key_str =
             str::from_utf8(include_bytes!("../../../notary/fixture/notary/notary.key")).unwrap();
         let signing_key = p256::ecdsa::SigningKey::from_pkcs8_pem(signing_key_str).unwrap();
 
-        loop {
-            // Asynchronously wait for an inbound socket.
-            let (socket, socket_addr) = listener.accept().await.unwrap();
+        // Spawn notarization task to be run concurrently
+        tokio::spawn(async move {
+            // Setup default config. Normally a different ID would be generated
+            // for each notarization.
+            let config = VerifierConfig::builder().id("example").build().unwrap();
 
-            println!("Accepted connection from: {}", socket_addr);
-
-            {
-                let signing_key = signing_key.clone();
-
-                // Spawn notarization task to be run concurrently
-                tokio::spawn(async move {
-                    // Setup default config. Normally a different ID would be generated
-                    // for each notarization.
-                    let config = VerifierConfig::builder().id("example").build().unwrap();
-
-                    Verifier::new(config)
-                        .notarize::<_, p256::ecdsa::Signature>(socket.compat(), &signing_key)
-                        .await
-                        .unwrap();
-                });
-            }
-        }
+            Verifier::new(config)
+                .notarize::<_, p256::ecdsa::Signature>(socket.compat(), &signing_key)
+                .await
+                .unwrap();
+        });
     });
 }
