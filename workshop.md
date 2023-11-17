@@ -64,9 +64,6 @@ Note: You can also run the `simple_prover` by clicking the **▶️ Run** button
 If the notarization was successful, you should see this output in the console:
 
 ```log
-Listening on: 127.0.0.1:8080
-Connected to the Notary
-Accepted connection from: 127.0.0.1:64072
 Starting an MPC TLS connection with the server
 Got a response from the server
 Notarization completed successfully!
