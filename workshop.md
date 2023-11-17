@@ -263,13 +263,26 @@ cargo run --release
 
 ### Run a Local Proxy
 
-TODO: why we need a local proxy
+Since web browser doesn't have the ability to make TCP connection, we have to run a websocket proxy server.
+
+
+To run your own websockify proxy locally, you can doing the following and point target url to `api.twitter.com:443` for this exercise.
 
 ```
 git clone https://github.com/novnc/websockify && cd websockify
 ./docker/build.sh
 docker run -it --rm -p 55688:80 novnc/websockify 80 api.twitter.com:443
 ```
+
+Or, you can simply use remote proxy at `ws://notary.efprivacyscaling.org:55688`
+
+1. Open the extension
+2. Click "Option"
+3. Update proxy URL and click "Save"
+
+<img width="478" alt="Screen Shot 2023-11-17 at 10 46 17 AM" src="https://github.com/tlsnotary/progcrypto_workshop/assets/87639218/1512c1e3-0840-4ef2-a470-ba7d3be8fa51">
+
+
 
 We have to jump through one more hoop: Because the local notary server is using a self-generated certificate, we have manually allow the certificate in our browser:<a name="certificate"></a>
 
@@ -287,13 +300,30 @@ Note that the page will show "This site can’t be reached" or "127.0.0.1 refuse
 
 * Open Twitter <https://twitter.com> and login if you haven't yet.
 
-* open the extension, you should see a box titled "Twitter Profile"
-![](images/extension_twitter_requests.png)
-* click **Notarize**
-![](images/extension_notarize.png)
-![](images/extesnion_notarize_pending.png)
+* open the extension, you should see requests being recorded:
+<img width="477" alt="Screen Shot 2023-11-17 at 10 47 51 AM" src="https://github.com/tlsnotary/progcrypto_workshop/assets/87639218/40738f38-42e0-45a4-a9af-ef6f2d1dc220">
 
-now you should see that the request is being made.
+* If you click "Notarize" here, the extension will automatically notarize the correct request to prove your twitter ID. **However, we are going to do it manually**
+
+* Click on "Requests", and then search for the text "setting" in search box
+
+<img width="479" alt="Screen Shot 2023-11-17 at 10 49 55 AM" src="https://github.com/tlsnotary/progcrypto_workshop/assets/87639218/10a26a6f-cb12-466b-8476-e651b20c9514">
+
+* Select the request, and then click on **Notarize**
+  
+<img width="477" alt="Screen Shot 2023-11-15 at 3 08 53 PM" src="https://github.com/tlsnotary/progcrypto_workshop/assets/87639218/b04cecd0-f028-4eb5-82de-7e50db4853c5">
+
+* First, select any headers that you would like to reveal. 
+
+<img width="479" alt="Screen Shot 2023-11-15 at 3 09 15 PM" src="https://github.com/tlsnotary/progcrypto_workshop/assets/87639218/190244ae-980d-4020-bb84-686d9b284a16">
+
+* Second, highlight the text that you want to make public to hide everything else.
+
+<img width="479" alt="Screen Shot 2023-11-15 at 3 09 30 PM" src="https://github.com/tlsnotary/progcrypto_workshop/assets/87639218/bed1ca25-4d6c-4fee-96f9-097535caef0f">
+
+* Click **Notarize**, you should see your notarization being processed
+
+<img width="477" alt="Screen Shot 2023-11-15 at 3 09 47 PM" src="https://github.com/tlsnotary/progcrypto_workshop/assets/87639218/ca39858f-2b4c-4dea-a8bc-5638aabbb4f2">
 
 You can open the offscreen console and observe the browser extension logs by going to <chrome://extensions> -> TLSN Extension -> Details -> offscreen.html
 
