@@ -7,9 +7,9 @@ edition = "2021"
 
 [dependencies]
 
-tlsn-core = { git = "https://github.com/tlsnotary/tlsn", branch = "dev" }
-tlsn-verifier = { git = "https://github.com/tlsnotary/tlsn", branch = "dev" }
-notary-server = { git = "https://github.com/tlsnotary/tlsn", branch = "dev" }
+tlsn-core = { git = "https://github.com/tlsnotary/tlsn", rev = "6152883" }
+tlsn-verifier = { git = "https://github.com/tlsnotary/tlsn", rev = "6152883" }
+notary-server = { git = "https://github.com/tlsnotary/tlsn", rev = "6152883" }
 
 p256 = { version = "0.13", features = ["ecdsa"] }
 tokio = { version = "1.33.0", features = [
