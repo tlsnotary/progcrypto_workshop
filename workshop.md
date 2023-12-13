@@ -237,7 +237,12 @@ If the examples above were too easy for you, try to notarize data from other web
 TODO: Proof ownership of a Twitter account with TLSNotary's browser extension
 
 ### Run Notary Server
-If the notary server isn't running already, run the notary server:
+1. Edit the notary server config [file](./notary/config/config.yaml) to turn off TLS so that the browser extension can connect to the local notary server without requiring extra steps to accept self-signed certificates in the browser.
+```yaml
+tls-signature:
+    enabled: false
+```
+2. Run the notary server:
 
 ```shell
 cd notary
@@ -281,20 +286,6 @@ Or, you can simply use remote proxy at `ws://notary.efprivacyscaling.org:55688`
 3. Update proxy URL and click "Save"
 
 <img width="478" alt="Screen Shot 2023-11-17 at 10 46 17 AM" src="https://github.com/tlsnotary/progcrypto_workshop/assets/87639218/1512c1e3-0840-4ef2-a470-ba7d3be8fa51">
-
-
-
-We have to jump through one more hoop: Because the local notary server is using a self-generated certificate, we have manually allow the certificate in our browser:<a name="certificate"></a>
-
-* Visit <https://127.0.0.1:7047> or <https://localhost:7047> in a new browser tab
-* click **Advanced** and next **Proceed to 127.0.0.1 (unsafe)
-
-This will manually override the ssl check on the local notary server and allow the extension to interact with it.
-
-![](images/notary_certificate.png)
-![](images/notary_certificate_advanced.png)
-
-Note that the page will show "This site can’t be reached" or "127.0.0.1 refused to connect". This is OK, we only need your browser to accept the local certificate.
 
 ### Notarize Twitter Account Access
 
